@@ -8,35 +8,52 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
-#include "BinaryData.h"
 
 //==============================================================================
 DistortionPluginAudioProcessorEditor::DistortionPluginAudioProcessorEditor (DistortionPluginAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
-    // Make sure that before the constructor has finished, you've set the
-    // editor's size to whatever you need it to be.
+    auto accentColour = juce::Colour (0xFFE04040);
 
-    
-    background = juce::ImageCache::getFromMemory(BinaryData::Abstractart_png, BinaryData::Abstractart_pngSize);
+    // Title label
+    titleLabel.setText ("BIT COLLAPSE", juce::dontSendNotification);
+    titleLabel.setFont (juce::Font (juce::FontOptions (22.0f).withStyle ("Bold")));
+    titleLabel.setColour (juce::Label::textColourId, accentColour);
+    titleLabel.setJustificationType (juce::Justification::centred);
+    addAndMakeVisible (titleLabel);
 
-    distortionKnob.setSliderStyle(Slider::Rotary);
-    distortionKnob.setRange(0.0, 100.0, 1.0);
-    addAndMakeVisible(&distortionKnob);
+    // Distortion knob
+    distortionKnob.setSliderStyle (juce::Slider::RotaryVerticalDrag);
+    distortionKnob.setTextBoxStyle (juce::Slider::TextBoxBelow, false, 60, 20);
+    distortionKnob.setColour (juce::Slider::rotarySliderFillColourId, accentColour);
+    distortionKnob.setColour (juce::Slider::rotarySliderOutlineColourId, juce::Colour (0xFF404040));
+    distortionKnob.setColour (juce::Slider::thumbColourId, accentColour);
+    distortionKnob.setColour (juce::Slider::textBoxTextColourId, juce::Colours::white);
+    distortionKnob.setColour (juce::Slider::textBoxOutlineColourId, juce::Colour (0xFF404040));
+    addAndMakeVisible (distortionKnob);
 
-    addAndMakeVisible(bitCrushButton);
+    // Distortion label
+    distortionLabel.setText ("DISTORTION", juce::dontSendNotification);
+    distortionLabel.setFont (juce::Font (juce::FontOptions (13.0f)));
+    distortionLabel.setColour (juce::Label::textColourId, juce::Colours::grey);
+    distortionLabel.setJustificationType (juce::Justification::centred);
+    addAndMakeVisible (distortionLabel);
 
+    // Bit crush toggle
+    bitCrushButton.setButtonText ("BIT CRUSH");
+    bitCrushButton.setColour (juce::ToggleButton::textColourId, juce::Colours::white);
+    bitCrushButton.setColour (juce::ToggleButton::tickColourId, accentColour);
+    bitCrushButton.setColour (juce::ToggleButton::tickDisabledColourId, juce::Colour (0xFF404040));
+    addAndMakeVisible (bitCrushButton);
 
-
-    distortionKnobAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(
+    // Parameter attachments
+    distortionKnobAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment> (
         audioProcessor.parameters, "distortionAmount", distortionKnob);
 
-    bitCrushButtonAttachment = std::make_unique<AudioProcessorValueTreeState::ButtonAttachment>(
+    bitCrushButtonAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment> (
         audioProcessor.parameters, "bitCrushEnabled", bitCrushButton);
 
-
-
-    setSize (400, 300);
+    setSize (300, 340);
 }
 
 DistortionPluginAudioProcessorEditor::~DistortionPluginAudioProcessorEditor()
@@ -46,41 +63,30 @@ DistortionPluginAudioProcessorEditor::~DistortionPluginAudioProcessorEditor()
 //==============================================================================
 void DistortionPluginAudioProcessorEditor::paint (juce::Graphics& g)
 {
-    // (Our component is opaque, so we must completely fill the background with a solid colour)
-    /*g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));*/
+    // Dark background
+    g.fillAll (juce::Colour (0xFF1A1A1A));
 
-    // Draw the background image
-    if (!background.isNull())
-        g.drawImageAt(background, 0, 0);
-    else
-        g.fillAll(juce::Colours::black);  // Fallback background color
+    // Subtle border
+    g.setColour (juce::Colour (0xFF303030));
+    g.drawRect (getLocalBounds(), 1);
 
-    g.setColour (juce::Colours::white);
-    g.setFont (15.0f);
-    g.drawFittedText ("Distortion Effect", getLocalBounds(), juce::Justification::centred, 1);
+    // Separator line below title
+    int separatorY = 50;
+    g.setColour (juce::Colour (0xFF303030));
+    g.drawHorizontalLine (separatorY, 10.0f, (float) getWidth() - 10.0f);
 }
 
 void DistortionPluginAudioProcessorEditor::resized()
 {
-    // This is generally where you'll want to lay out the positions of any
-    // subcomponents in your editor..
+    auto area = getLocalBounds();
 
-    //distortionKnob.setBounds(getLocalBounds().reduced(40));
+    titleLabel.setBounds (area.removeFromTop (48));
 
-    // Example values for the slider's position and size
-    int sliderX = 50;
-    int sliderY = 50;
-    int sliderWidth = 200;
-    int sliderHeight = 40;
+    auto knobArea = area.removeFromTop (200);
+    distortionKnob.setBounds (knobArea.reduced (50, 10));
 
-    // Set the bounds for the distortion slider
-    distortionKnob.setBounds(sliderX, sliderY, sliderWidth, sliderHeight);
+    distortionLabel.setBounds (area.removeFromTop (20));
 
-    // Set the bounds for the bit crush button
-    // Positioning it below the slider with a padding of 10 pixels
-    int buttonPadding = 10;
-    int buttonWidth = 100;
-    int buttonHeight = 30;
-    bitCrushButton.setBounds(sliderX, sliderY + sliderHeight + buttonPadding, buttonWidth, buttonHeight);
-
+    auto buttonArea = area.removeFromTop (40);
+    bitCrushButton.setBounds (buttonArea.withSizeKeepingCentre (140, 30));
 }
