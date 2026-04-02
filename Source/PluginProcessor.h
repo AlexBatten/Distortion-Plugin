@@ -55,11 +55,24 @@ public:
 
     AudioProcessorValueTreeState parameters;
 
-    float DistortionPluginAudioProcessor::applyDistortion(float inputSignal, float amount);
-
-    float DistortionPluginAudioProcessor::applyBitCrush(float inputSignal, bool bitCrushEnabled);
+    enum DistortionType
+    {
+        HardClip = 0,
+        SoftClip,
+        Foldback,
+        ArcTan
+    };
 
 private:
+    float applyDistortion (float sample, float drive, int type);
+
+    // Tone filter state (one per channel, simple one-pole low-pass)
+    float toneFilterState[2] = { 0.0f, 0.0f };
+
+    // Bit crush state
+    float downsampleHold[2] = { 0.0f, 0.0f };   // held sample per channel
+    int downsampleCounter[2] = { 0, 0 };          // counter per channel
+
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DistortionPluginAudioProcessor)
 };

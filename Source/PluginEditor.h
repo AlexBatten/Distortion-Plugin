@@ -27,13 +27,37 @@ public:
 private:
     DistortionPluginAudioProcessor& audioProcessor;
 
-    juce::Slider distortionKnob;
-    juce::ToggleButton bitCrushButton;
-    juce::Label distortionLabel;
     juce::Label titleLabel;
 
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> distortionKnobAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> bitCrushButtonAttachment;
+    // Distortion controls
+    juce::ComboBox distortionTypeBox;
+    juce::Label distortionTypeLabel;
 
+    juce::Slider driveKnob;
+    juce::Label driveLabel;
+
+    juce::Slider mixKnob;
+    juce::Label mixLabel;
+
+    juce::Slider toneKnob;
+    juce::Label toneLabel;
+
+    // Bit crush controls
+    juce::ToggleButton bitCrushButton;
+
+    juce::Slider bitDepthKnob;
+    juce::Label bitDepthLabel;
+
+    juce::Slider downsampleKnob;
+    juce::Label downsampleLabel;
+
+    // Attachments
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> distortionTypeAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> driveAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mixAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> toneAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> bitCrushAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> bitDepthAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> downsampleAttachment;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DistortionPluginAudioProcessorEditor)
 };
